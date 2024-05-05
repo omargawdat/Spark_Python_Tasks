@@ -161,3 +161,4 @@ cython_debug/
 #.idea/
 
 pagecounts-20160101-000000_parsed.out
+results/

@@ -1,30 +1,20 @@
+
 from base_class import DataProcessingTask
 
 
-# todo refactor cods to separate between loop and mapreduce
 class Question2(DataProcessingTask):
+    def __init__(self):
+        super().__init__(question_number=2)
+
     def process_data_with_loops(self, rdd):
-        count_all_the = 0
-        count_non_en_the = 0
-
-        for line in rdd.toLocalIterator():
-            parts = line.split(" ")
-            if len(parts) >= 2 and parts[1].startswith('The_'):
-                count_all_the += 1
-                if parts[0] != 'en':
-                    count_non_en_the += 1
-
-        results = (f"Total 'The' page titles: {count_all_the}, "
-                   f"Non-English 'The' page titles: {count_non_en_the}")
-        return results
+        data = rdd.map(lambda x: (x.split(" ")[0], x.split(" ")[1])).collect()
+        count_the = sum(1 for code, title in data if title.startswith("The"))
+        non_en_count = sum(1 for code, title in data if title.startswith("The") and not code.startswith("en"))
+        return f"Titles starting with 'The': {count_the}\nTitles starting with 'The' and not in English project: {non_en_count}"
 
     def process_data_with_mapreduce(self, rdd):
-        titles_with_the = rdd.map(lambda line: line.split(" ", 2)) \
-            .filter(lambda parts: len(parts) >= 2 and parts[1].startswith('The_'))
-
-        count_all_the = titles_with_the.count()
-        non_en_titles_with_the = titles_with_the.filter(lambda parts: parts[0] != 'en').count()
-
-        results = self.sc.parallelize([(f"Total 'The' page titles (MR): {count_all_the}",),
-                                       (f"Non-English 'The' page titles (MR): {non_en_titles_with_the}",)])
-        return results
+        filtered_titles = rdd.map(lambda x: x.split(" ")) \
+            .filter(lambda x: x[1].startswith("The"))
+        count_the = filtered_titles.count()
+        non_en_count = filtered_titles.filter(lambda x: not x[0].startswith("en")).count()
+        return f"Titles starting with 'The': {count_the}\nTitles starting with 'The' and not in English project: {non_en_count}"
