@@ -6,24 +6,15 @@ class Question1(DataProcessingTask):
         super().__init__(question_number=1)
 
     def process_data_with_loops(self, rdd):
-        # Collecting and processing data on the driver to simulate a loop
-        page_size_pairs = rdd.flatMap(lambda line: [
-            ('key', int(line.split(" ")[-1])) if line.split(" ")[-1] != 'null' and len(line.split(" ")) > 1 else (
-                'key', 0)]).collect()
-
-        # Creating a dictionary to simulate grouping by key
-        grouped_sizes = {}
-        for key, size in page_size_pairs:
-            if key not in grouped_sizes:
-                grouped_sizes[key] = []
-            grouped_sizes[key].append(size)
+        page_sizes = rdd.flatMap(lambda line: [
+            int(line.split(" ")[-1]) if line.split(" ")[-1] != 'null' and len(line.split(" ")) > 1 else 0
+        ]).collect()
 
         # Calculating min, max, and average sizes from the collected sizes
-        if grouped_sizes['key']:
-            sizes = grouped_sizes['key']
-            min_size = min(sizes)
-            max_size = max(sizes)
-            avg_size = sum(sizes) / len(sizes)
+        if page_sizes:
+            min_size = min(page_sizes)
+            max_size = max(page_sizes)
+            avg_size = sum(page_sizes) / len(page_sizes)
         else:
             min_size = max_size = avg_size = 0
 
