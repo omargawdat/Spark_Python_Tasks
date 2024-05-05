@@ -65,3 +65,5 @@ class DataProcessingTask(ABC):
         end_time = time.time()
         print(f"Elapsed time with MapReduce: {end_time - start_time} seconds\n")
         self.save_results(results, "MapReduce")
+
+
