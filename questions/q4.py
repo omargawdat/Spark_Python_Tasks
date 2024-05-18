@@ -6,15 +6,26 @@ class Question4(DataProcessingTask):
         super().__init__(question_number=4)
 
     def process_data_with_loops(self, rdd):
-        titles = rdd.map(lambda x: x.split(" ")[1]).collect()
+        # Collect the RDD to the driver node
+        data = rdd.collect()
+
+        # Initialize a dictionary to store the title counts
         title_count = {}
-        for title in titles:
-            if title in title_count:
-                title_count[title] += 1
-            else:
-                title_count[title] = 1
+
+        # Iterate through the collected data
+        for line in data:
+            parts = line.split(" ")
+            if len(parts) > 1:
+                title = parts[1]
+                if title in title_count:
+                    title_count[title] += 1
+                else:
+                    title_count[title] = 1
+
+        # Format the results as a string
         results = "\n".join([f"{title}: {count}" for title, count in title_count.items()])
         return results
+
 
     def process_data_with_mapreduce(self, rdd):
         title_count = rdd \

@@ -6,13 +6,28 @@ class Question1(DataProcessingTask):
         super().__init__(question_number=1)
 
     def process_data_with_loops(self, rdd):
-        page_sizes = rdd.flatMap(lambda line: [
-            int(line.split(" ")[-1]) if line.split(" ")[-1] != 'null' and len(line.split(" ")) > 1 else 0
-        ]).collect()
-        if page_sizes:
-            min_size = min(page_sizes)
-            max_size = max(page_sizes)
-            avg_size = sum(page_sizes) / len(page_sizes)
+        # Collect the RDD to the driver node
+        data = rdd.collect()
+
+        # Initialize variables
+        min_size = float('inf')
+        max_size = float('-inf')
+        total_size = 0
+        count = 0
+
+        # Iterate through the collected data
+        for line in data:
+            parts = line.split(" ")
+            if len(parts) > 1 and parts[-1] != 'null':
+                page_size = int(parts[-1])
+                min_size = min(min_size, page_size)
+                max_size = max(max_size, page_size)
+                total_size += page_size
+                count += 1
+
+        # Compute the average size
+        if count > 0:
+            avg_size = total_size / count
         else:
             min_size = max_size = avg_size = 0
 

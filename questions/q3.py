@@ -7,12 +7,16 @@ class Question3(DataProcessingTask):
         super().__init__(question_number=3)
 
     def process_data_with_loops(self, rdd):
-        titles = rdd.map(lambda x: x.split(" ")[1]).collect()
+        data = rdd.collect()
+
         unique_terms = set()
 
-        for title in titles:
-            normalized_terms = re.sub(r'[^a-zA-Z0-9_]', '', title.lower()).split("_")
-            unique_terms.update(normalized_terms)
+        for line in data:
+            parts = line.split(" ")
+            if len(parts) > 1:
+                title = parts[1]
+                normalized_terms = re.sub(r'[^a-zA-Z0-9_]', '', title.lower()).split("_")
+                unique_terms.update(normalized_terms)
 
         return f"Number of unique terms in page titles: {len(unique_terms)}"
 

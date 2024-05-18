@@ -6,13 +6,22 @@ class Question5(DataProcessingTask):
         super().__init__(question_number=5)
 
     def process_data_with_loops(self, rdd):
-        title_data = rdd.map(lambda x: (x.split(" ")[1], x)).collect()
-        combined_data = {}
-        for title, data in title_data:
-            if title not in combined_data:
-                combined_data[title] = []
-            combined_data[title].append(data)
+        # Collect the RDD to the driver node
+        data = rdd.collect()
 
+        # Initialize a dictionary to store the combined data
+        combined_data = {}
+
+        # Iterate through the collected data
+        for line in data:
+            parts = line.split(" ")
+            if len(parts) > 1:
+                title = parts[1]
+                if title not in combined_data:
+                    combined_data[title] = []
+                combined_data[title].append(line)
+
+        # Format the results as a string
         results = ""
         for title, datas in combined_data.items():
             formatted_datas = "\n".join([f"    {data}" for data in datas])
