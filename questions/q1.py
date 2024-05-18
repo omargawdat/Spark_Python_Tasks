@@ -9,8 +9,6 @@ class Question1(DataProcessingTask):
         page_sizes = rdd.flatMap(lambda line: [
             int(line.split(" ")[-1]) if line.split(" ")[-1] != 'null' and len(line.split(" ")) > 1 else 0
         ]).collect()
-
-        # Calculating min, max, and average sizes from the collected sizes
         if page_sizes:
             min_size = min(page_sizes)
             max_size = max(page_sizes)
